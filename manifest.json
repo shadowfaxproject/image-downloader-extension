@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Image Downloader",
+  "version": "1.0",
+  "description": "Hover over an image and press Alt+D or click the overlay button to download it.",
+  "permissions": [
+    "downloads",
+    "scripting",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "css": ["content.css"]
+    }
+  ],
+  "commands": {
+    "download-image": {
+      "suggested_key": {
+        "default": "Alt+D"
+      },
+      "description": "Download hovered image"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

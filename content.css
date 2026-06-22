@@ -1,0 +1,25 @@
+#img-dl-btn {
+  position: fixed;
+  z-index: 2147483647;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  transition: background 0.15s;
+}
+
+#img-dl-btn:hover {
+  background: rgba(0, 100, 220, 0.85);
+}
+
+#img-dl-btn svg {
+  width: 18px;
+  height: 18px;
+  fill: white;
+}
