@@ -31,48 +31,49 @@ function createBtn() {
   return el;
 }
 
-function showBtn(img, e) {
-  if (!btn) btn = createBtn();
-  const pad = 8;
-  btn.style.left = (e.clientX - 44) + 'px';
-  btn.style.top  = (e.clientY - 44) + 'px';
+function positionBtn(img) {
+  const rect = img.getBoundingClientRect();
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
+  btn.style.left = (rect.left + scrollX + 8) + 'px';
+  btn.style.top  = (rect.top  + scrollY + 8) + 'px';
   btn.style.display = 'flex';
 }
 
+function showBtn(img) {
+  if (!btn) btn = createBtn();
+  hoveredImg = img;
+  positionBtn(img);
+}
+
 function hideBtn() {
+  hoveredImg = null;
   if (btn) btn.style.display = 'none';
 }
 
 document.addEventListener('mouseover', (e) => {
-  const img = e.target.closest('img, [style*="background-image"]');
-  if (img && img.tagName === 'IMG' && img.src) {
-    hoveredImg = img;
-    showBtn(img, e);
+  const img = e.target.closest('img');
+  if (img && img.src) {
+    showBtn(img);
   }
 }, true);
-
-document.addEventListener('mousemove', (e) => {
-  if (!hoveredImg) return;
-  if (btn && btn.style.display === 'flex') {
-    btn.style.left = (e.clientX - 44) + 'px';
-    btn.style.top  = (e.clientY - 44) + 'px';
-  }
-});
 
 document.addEventListener('mouseout', (e) => {
   const to = e.relatedTarget;
-  if (!to || (to !== btn && !to.closest('#img-dl-btn'))) {
-    if (e.target === hoveredImg) {
-      setTimeout(() => {
-        if (!btn || btn.matches(':hover')) return;
-        hoveredImg = null;
-        hideBtn();
-      }, 200);
-    }
+  if (to && to.closest('#img-dl-btn')) return;
+  if (e.target === hoveredImg) {
+    setTimeout(() => {
+      if (btn && btn.matches(':hover')) return;
+      hideBtn();
+    }, 150);
   }
 }, true);
 
-// Keyboard shortcut listener (Alt+D)
+// Reposition on scroll/resize
+window.addEventListener('scroll', () => { if (hoveredImg) positionBtn(hoveredImg); }, true);
+window.addEventListener('resize', () => { if (hoveredImg) positionBtn(hoveredImg); });
+
+// Keyboard shortcut
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.action === 'keyboard-download' && hoveredImg) {
     downloadImage(hoveredImg.src || hoveredImg.currentSrc);
