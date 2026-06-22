@@ -88,12 +88,19 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-// Reset state on SPA navigation (URL changes without full page reload)
+// Reset state on any navigation (back/forward keys, SPA route changes)
+function resetState() {
+  hideBtn();
+  if (btn) { btn.remove(); btn = null; }
+}
+
 let lastUrl = location.href;
 new MutationObserver(() => {
   if (location.href !== lastUrl) {
     lastUrl = location.href;
-    hideBtn();
-    if (btn) { btn.remove(); btn = null; }
+    resetState();
   }
 }).observe(document, { subtree: true, childList: true });
+
+window.addEventListener('popstate', resetState);
+window.addEventListener('pageshow', resetState);
