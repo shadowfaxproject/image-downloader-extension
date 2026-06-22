@@ -12,7 +12,15 @@ function getFilename(url) {
 }
 
 function downloadImage(url) {
-  chrome.runtime.sendMessage({ action: 'download', url, filename: getFilename(url) });
+  try {
+    chrome.runtime.sendMessage({ action: 'download', url, filename: getFilename(url) });
+  } catch (e) {
+    // Extension context invalidated — fall back to direct download via anchor
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = getFilename(url);
+    a.click();
+  }
 }
 
 function createBtn() {
