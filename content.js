@@ -33,7 +33,7 @@ function createBtn() {
   el.addEventListener('click', (e) => {
     e.stopPropagation();
     e.preventDefault();
-    if (hoveredImg) downloadImage(hoveredImg.src || hoveredImg.currentSrc);
+    if (hoveredImg) downloadImage(hoveredImg._downloadUrl);
   });
   document.body.appendChild(el);
   return el;
@@ -59,10 +59,31 @@ function hideBtn() {
   if (btn) btn.style.display = 'none';
 }
 
+function getBgImageUrl(el) {
+  const style = window.getComputedStyle(el);
+  const bg = style.backgroundImage;
+  if (bg && bg !== 'none') {
+    const match = bg.match(/url\(["']?([^"')]+)["']?\)/);
+    return match ? match[1] : null;
+  }
+  return null;
+}
+
 document.addEventListener('mouseover', (e) => {
+  // Check for <img> tag
   const img = e.target.closest('img');
-  if (img && img.src) {
+  if (img && (img.src || img.currentSrc)) {
+    img._downloadUrl = img.src || img.currentSrc;
     showBtn(img);
+    return;
+  }
+
+  // Check for background-image on any element
+  const el = e.target.closest('[style*="background"]') || e.target;
+  const bgUrl = getBgImageUrl(el);
+  if (bgUrl) {
+    el._downloadUrl = bgUrl;
+    showBtn(el);
   }
 }, true);
 
@@ -84,7 +105,7 @@ window.addEventListener('resize', () => { if (hoveredImg) positionBtn(hoveredImg
 // Keyboard shortcut
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.action === 'keyboard-download' && hoveredImg) {
-    downloadImage(hoveredImg.src || hoveredImg.currentSrc);
+    downloadImage(hoveredImg._downloadUrl);
   }
 });
 
