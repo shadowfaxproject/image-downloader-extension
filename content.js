@@ -79,3 +79,13 @@ chrome.runtime.onMessage.addListener((msg) => {
     downloadImage(hoveredImg.src || hoveredImg.currentSrc);
   }
 });
+
+// Reset state on SPA navigation (URL changes without full page reload)
+let lastUrl = location.href;
+new MutationObserver(() => {
+  if (location.href !== lastUrl) {
+    lastUrl = location.href;
+    hideBtn();
+    if (btn) { btn.remove(); btn = null; }
+  }
+}).observe(document, { subtree: true, childList: true });
